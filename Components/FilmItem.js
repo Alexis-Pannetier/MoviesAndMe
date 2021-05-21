@@ -14,7 +14,7 @@ export default class Search extends React.Component {
         <Image
           style={{ height: 180, width: 120 }}
           source={{
-            uri: "https://image.tmdb.org/t/p/original/" + data.poster_path,
+            uri: "https://image.tmdb.org/t/p/original/" + data?.poster_path,
           }}
         />
         <View style={{ flex: 1 }}>
