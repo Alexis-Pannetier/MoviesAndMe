@@ -1,17 +1,14 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
-import Search from "./Components/Search";
+import Navigation from "./Navigation/Navigation";
+import { Provider } from "react-redux";
+import Store from "./Store/ConfigureStore";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Search />
-    </View>
-  );
+export default class App extends React.Component {
+  render() {
+    return (
+      <Provider store={Store}>
+        <Navigation />
+      </Provider>
+    );
+  }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 50,
-  },
-});

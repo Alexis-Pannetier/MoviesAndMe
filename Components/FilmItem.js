@@ -1,11 +1,24 @@
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { getImageFromApi } from "../API/TMDBApi";
 
 export default class Search extends React.Component {
+  _displayFavoriteImage() {
+    if (this.props.isFilmFavorite) {
+      return (
+        <Image
+          style={styles.favorite_image}
+          source={require("../assets/favorite.png")}
+        />
+      );
+    }
+  }
+
   render() {
-    const { data } = this.props;
+    const { data, displayDetailForFilm } = this.props;
     return (
-      <View
+      <TouchableOpacity
+        onPress={() => displayDetailForFilm(data.id)}
         style={{
           flexDirection: "row",
           margin: 8,
@@ -14,7 +27,7 @@ export default class Search extends React.Component {
         <Image
           style={{ height: 180, width: 120 }}
           source={{
-            uri: "https://image.tmdb.org/t/p/original/" + data?.poster_path,
+            uri: getImageFromApi(data?.poster_path),
           }}
         />
         <View style={{ flex: 1 }}>
@@ -27,6 +40,7 @@ export default class Search extends React.Component {
           >
             <View style={{ flex: 1, margin: 4 }}>
               <Text>Titre : {data.title}</Text>
+              {this._displayFavoriteImage()}
             </View>
             <View style={{ flex: 1, margin: 4 }}>
               <Text>Vote : {data.vote_average}</Text>
@@ -55,7 +69,15 @@ export default class Search extends React.Component {
             </Text>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  favorite_image: {
+    width: 25,
+    height: 25,
+    marginRight: 5,
+  },
+});

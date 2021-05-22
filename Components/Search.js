@@ -1,13 +1,12 @@
 import React from "react";
 import {
-  ActivityIndicator,
-  FlatList,
   StyleSheet,
-  TextInput,
   View,
+  TextInput,
+  Button,
+  ActivityIndicator,
 } from "react-native";
-// import films from "../Helpers/filmsData";
-import FilmItem from "../Components/FilmItem";
+import FilmList from "./FilmList";
 import { getFilmsFromApiWithSearchedText } from "../API/TMDBApi";
 
 class Search extends React.Component {
@@ -20,9 +19,10 @@ class Search extends React.Component {
       films: [],
       isLoading: false,
     };
+    this._loadFilms = this._loadFilms.bind(this);
   }
 
-  _loadFilms() {
+  _loadFilms = () => {
     if (this.searchedText.length > 0) {
       this.setState({ isLoading: true });
       getFilmsFromApiWithSearchedText(this.searchedText, this.page + 1).then(
@@ -36,9 +36,13 @@ class Search extends React.Component {
         }
       );
     }
+  };
+
+  _searchTextInputChanged(text) {
+    this.searchedText = text;
   }
 
-  _searchFilms() {
+  _searchFilms = () => {
     this.page = 0;
     this.totalPages = 0;
     this.setState(
@@ -46,22 +50,14 @@ class Search extends React.Component {
         films: [],
       },
       () => {
-        console.log(
-          "Page : " +
-            this.page +
-            " / TotalPages : " +
-            this.totalPages +
-            " / Nombre de films : " +
-            this.state.films.length
-        );
         this._loadFilms();
       }
     );
-  }
+  };
 
-  _searchTextInputChanged(text) {
-    this.searchedText = text;
-  }
+  _displayDetailForFilm = (idFilm) => {
+    this.props.navigation.navigate("FilmDetail", { idFilm: idFilm });
+  };
 
   _displayLoading() {
     if (this.state.isLoading) {
@@ -75,25 +71,21 @@ class Search extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={styles.main_container}>
         <TextInput
-          placeholder="Nom"
+          style={styles.textinput}
+          placeholder="Titre du film"
           onChangeText={(text) => this._searchTextInputChanged(text)}
           onSubmitEditing={() => this._searchFilms()}
-          style={styles.textinput}
         />
-        {/* <Button title="Rechercher" onPress={() => this._loadFilms()} /> */}
-
-        <FlatList
-          data={this.state.films}
-          keyExtractor={(item) => item.id.toString()}
-          onEndReachedThreshold={0.5}
-          onEndReached={() => {
-            if (this.page < this.totalPages) {
-              this._loadFilms();
-            }
-          }}
-          renderItem={({ item }) => <FilmItem data={item} />}
+        {/* <Button title="Rechercher" onPress={() => this._searchFilms()} /> */}
+        <FilmList
+          films={this.state.films}
+          navigation={this.props.navigation}
+          loadFilms={this._loadFilms}
+          page={this.page}
+          totalPages={this.totalPages}
+          favoriteList={false} // Ici j'ai simplement ajouté un booléen à false pour indiquer qu'on n'est pas dans le cas de l'affichage de la liste des films favoris. Et ainsi pouvoir déclencher le chargement de plus de films lorsque l'utilisateur scrolle.
         />
         {this._displayLoading()}
       </View>
@@ -102,6 +94,9 @@ class Search extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  main_container: {
+    flex: 1,
+  },
   textinput: {
     marginLeft: 5,
     marginRight: 5,
